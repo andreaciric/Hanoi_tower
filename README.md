@@ -6,5 +6,5 @@ Programmed in processing.
 
 **YOU NEED PROCESSING TO RUN THE PROGRAM**
 
-Code, video of the simulation & article about Hanoi tower problem.
+Code, video of the simulation & article (written in Serbian language) about Hanoi tower problem.
 
