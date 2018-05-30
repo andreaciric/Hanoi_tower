@@ -1,0 +1,199 @@
+\documentclass[a4paper,12pt]{article}
+
+%% Language and font encodings
+\usepackage[greek, serbian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1, T2A]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{listings}
+\usepackage{color}
+
+\title{\Huge{\textbf{Hanojska kula}}}
+\author{\huge{\textsl{Andrea Ćirić 2016/0202 OE}}}
+
+\begin{document}
+
+\maketitle
+
+\bigskip
+
+\begin{center}
+	\Large{Mentori: doc. dr Ivana Jovović i prof. dr Branko Malešević}
+\end{center}
+
+\thispagestyle{empty}
+
+\begin{figure}[b!]
+	\centering
+    \includegraphics[width = 3cm]{logobljak.jpg}
+\end{figure}
+
+\newpage
+
+\section{Uvod}
+
+Hanojska kula je matematička igra ili slagalica, mozgalica. Sastoji se od tri uspravna štapa i određenog broja diskova različitih veličina postavljenih na prvom štapu u rastućem redosledu tako da se najveći disk nalazi na dnu, a najmanji na vrhu. Cilj ove mozgalice je da se svi diskovi prebace na treći štap ako važe pravila:
+
+\begin{enumerate}
+\item Samo jedan disk može da se pomera istovremeno.
+\item Mogu da se premeštaju samo diskovi koji se nalaze na vrhovima štapova u tom trenutku.
+\item Ne sme se stavljati veći disk preko manjeg.
+\end{enumerate}
+
+\begin{figure}[ht!]
+	\centering
+    \includegraphics[width = 10cm]{jedan.png}
+\end{figure}
+
+\section{Poreklo}
+
+Zagonetku ,,\textsl{Hanojska kula}`` je izmislio francuski matematičar \textsl{Eduar Lukas} 1883. godine. Postoji priča o indijskom hramu u Kaši Vivanatu, koji sadrži veliku sobu sa tri poruke koje su istrošene kroz vreme i koje su okružene sa 64 zlatna diska. Sveštenici Bramani, radeći u skladu sa starim proročanstvom, pomeraju ove diskove po nepromenljivim pravilima Brahme od tad. Iz tog razloga ova zagonetka je poznata i pod imenima \textsl{Brahmina kula} i \textsl{Lukasova kula}. Prema legendi, svet će se srušiti kada bude bio završen poslednji potez?! Nije poznato da li je Lukas bio nadahnut ovom legendom ili ju je on izmislio.
+
+Ako su sveštenici bili u stanju da pomeraju diskove u sekundi trebalo bi im $2^{64} - 1$ sekundi što je oko 585 milijardi godina.
+
+Postoje mnoge varijacije na ovu legendu. Na primer, u nekim kazivanjima hram je manastir, a sveštenici su monasi ili da je toranj nastao na početku sveta i da se vrši jedan potez dnevno.
+
+\section{Rešenje}
+
+Zagonetka se može igrati sa bilo kojim brojem diskova. Minimalan broj poteza potrebnih da se reši ovaj problem je $2^n -1$.
+
+\subsection{Iterativno rešavanje}
+Neka su A, B i C štapovi na kojima stoje diskovi gde se na štapu A nalaze diskovi na početku, a na štap C ih je potrebno prebaciti.U zavisnosti od toga da li je broj diskova paran ili neparan, razlikuju se sledeća dva algoritma.
+
+
+\noindent Za paran broj diskova:
+\begin{itemize}
+\item Napravi ispravan potez između rupa A i B
+\item Napravi ispravan potez između rupa A i C
+\item Napravi ispravan potez između rupa B i C
+\end{itemize}
+
+\noindent Za neparan broj diskova:
+\begin{itemize}
+\item Napravi ispravan potez između rupa A i C
+\item Napravi ispravan potez između rupa A i B
+\item Napravi ispravan potez između rupa C i B
+\end{itemize}
+
+Ova dva algoritma se ponavljaju dok se ne prebace svi diskovi. U svakom je napravljen ukupno $2^n-1$ potez gde je $n$ broj diskova.
+
+\begin{figure}[ht!]
+	\centering
+    \includegraphics[width = \textwidth]{tri_it.png}
+    \caption{Prikaz rešenja za tri diska}
+\end{figure}
+
+
+Ispod se nalazi primer koda iz simulacije rađene u Processingu, kucan u programskom jeziku Java.
+
+
+\lstset{language=Java}
+\begin{lstlisting}
+void towerOfHanoiIt() {
+  		if (i%3 == 1) {
+    		swap(A, n%2 == 0 ? B : C);
+  		} else if (i%3 == 2) {
+    		swap(A, n%2 == 0 ? C : B);
+  		} else {
+    		swap(B, C);
+  		}
+	}
+\end{lstlisting}
+
+\subsection{Rekurzivno rešavanje}
+
+Ključ za rešavanje ovog problema je da se uoči da se problem može rešiti razbijanjem na manje probleme i dalje razbijanjem tih problema na još sitnije probleme sve dok se ne stigne do rešenja.
+
+Neka su štapovi obeleženi sa A, B i C kao u iterativnom primeru. Neka je $n$ ukupan broj diskova.
+
+\noindent Rekurzivni algoritam za premeštanje $n$ diskova sa A na C:
+\begin{enumerate}
+\item Premesti $n-1$ disk sa A na B
+\item premesti $n$ sa A na C
+\item Premesti $n-1$ disk sa B na C
+\end{enumerate}
+
+Ovo je rekurzivni algoritam što znači da se isti algoritam ponovo sprovodi i u koracima 1 i 3 samo za manji broj diskova.
+
+\bigskip
+
+Primer koda za rekurzivno rešavanje problema u jeziku Java:
+
+\lstset{language=Java}
+\begin{lstlisting}
+	void towerOfHanoi(int n, ArrayList<Integer> from, ArrayList<Integer> to, ArrayList<Integer> temp)
+    {      
+        if (n == 1)
+        {
+            swap(from,to);
+            return;
+        }
+        towerOfHanoi(n-1, from, temp, to);
+        swap(from,to);
+        towerOfHanoi(n-1, temp, to, from);
+    }
+\end{lstlisting}
+
+\newpage
+
+\begin{figure}[ht!]
+	\centering
+    \includegraphics[width = \textwidth]{rekslik.png}
+    \caption{Prikaz rekurzivnog rešenja za četiri diska}
+\end{figure}
+
+\subsection{Binarno rešavanje}
+
+Problem Hanojske kule može se rešiti i korišćenjem binarnih cifara na sledeći način. 
+Za $n$ diskova potreban nam je binarni broj od $n$ cifara. Bit najmanje težine predstavlja najmanji disk i tako redom do bita najveće težine koji predstavlja najveći disk. Pri svakom inkrementiranju binarne predstave za jedan određena 0 se pretvara u 1 što označava pomeranje diska kojem je dodeljena ta težinska cifra koja se promenila u tom potezu. 
+
+\section{Grafički prikaz}
+
+Rešavanje problema može biti prikazano i preko grafova gde čvorovi predstavljaju stanja u kojima se diskovi nalaze u određenom trenutku, a linije poteze. Dva čvora su susedna ako je samo jedan potez izvršen između njih. Za slučaj sa dva diska formira se sledeći graf:
+
+\begin{figure}[ht!]
+	\centering
+    \includegraphics[width = 8cm]{sierpi_kul_beli.png}
+\end{figure}
+
+Čvorovi na temenima najvećeg trougla predstavljaju stanja gde se svi diskovi nalaze na jednom štapu. 
+
+Graf za $n+1$ diskova se dobija uzimanjem tri primerka grafa za $n$ diskova. Svaki od njih predstavlja položaje i poteze manjih diskova za jednu određenu poziciju novog najvećeg diska. Spajanje ta tri grafa na odgovarajućim uglovima predstavlja graf za $n+1$ broj diskova. Dodavanjem broja diskova uočava se pravilnost tj. fraktal, \textsl{trougao Sjerpinjskog}. 
+
+\newpage
+
+\begin{figure}[ht!]
+	\centering
+    \includegraphics[width = 8cm]{sierpinski.png}
+    \caption{Trougao Sjerpinjskog}
+\end{figure}
+
+\section{Primena}
+
+Hanojska kula se često koristi u psihološkim istraživanjima za rešavanje problema. Takođe postoji varijanta ovog problema pod nazivom \textsl{Kula Londona} za neuropsihološku dijagnostiku i lečenje izvršnih funkcija. Koristi se kao test za procenu deficita frontalnog režnja koji između ostalog služi za procenu posledica određenog postupka.
+
+Popularna je pri učenju rekurzivnih algoritama u programiranju.
+
+Naučnici su 2010. godine objavili rezultate eksperimenta gde Argentinski mrav uspešno mogao da reši verziju sa tri diska Hanojske kulekroz nelinearnu dinamiku ili signala feromona.
+
+
+\section*{Literatura}
+\addcontentsline{toc}{section}{Literatura}
+
+Sniedovich, Moshe (2010). \textit{Dynamic Programming: Foundations and Principles}. ISBN 978-0-8247-4099-3.
+
+Petković, Miodrag (2009). \textit{Famous Puzzles of Great Mathematicians}. AMS Bookstore. str. 197. ISBN 978-0-8218-4814-2.
+
+Spitznagel, Edward L. (1971). \textit{Selected topics in mathematics}. Holt, Rinehart and Winston. str. 137. ISBN 978-0-03-084693-9.
+
+Hofstadter, Douglas R. (1985). \textit{Metamagical Themas : Questing for the Essence of Mind and Pattern}. New York: Basic Books. ISBN 978-0-465-04540-2
+
+\end{document}
